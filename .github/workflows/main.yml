@@ -1,0 +1,33 @@
+name: Generate Paddle Calendar Report
+
+on:
+  schedule:
+    - cron: '0 6 * * 6' # Saturday morning at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Nix with built-in GitHub Actions caching enabled by default
+      - name: Set up Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          # Optional: prevent GitHub API rate limits during fetching
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Run your script using your pinned shell.nix
+      - name: Run calendar script via Nix shell
+        run: nix-shell --run "./run"
+
+      # Commit the generated output back to your repo
+      - name: Commit generated output
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "Automated calendar update"
+          git push

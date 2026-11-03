@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Fetching environmental data and generating paddle report..."
+Rscript run_pipeline.R
+echo "Report successfully generated!"
